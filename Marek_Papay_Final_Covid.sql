@@ -60,14 +60,11 @@ select DISTINCT date, month_day, day_date,
 	   	end as seasons
 from day_month_papay dmp;
 
-select *
-from papay_weekday pw ;
-
+/* deleting index as I had to copy tables from the other database*/
 alter table t_Marek_Papay_projekt_SQL_final
 drop column `index`;
 
 /* integrating dates to table*/
-
 create table integration_date_to_final as
 select  tmppsf.*, s.seasons, pw.week
 from 	(select *
@@ -121,6 +118,7 @@ select r1.year ,r1.country, r1.religion,
 	on	r1.country = r2.country
 	and r2.sum_population > 0
 	and r2.sum_population is not null;
+
 /* creating a table with seasons - religions - nineth task*/
 create table life_expectyncy_diff as
 select le.country, round(le2.life_expectancy - le.life_expectancy, 2) as life_expectancy_diff
@@ -135,7 +133,6 @@ from
 	 from life_expectancy
 	 where year = 2015) le2
 	on le.country = le2.country;
-
 
 /* religion to columns*/
 create table distinct_religion
@@ -166,20 +163,8 @@ join (select country, Judaism
 	  from distinct_religion
 	  where Judaism is not null) as jud
 	  on chr.country = jud.country;
-	 
-create table final_table_before_weather as
-select  ctfggm.*, nr.christianity, nr.islam, nr.hinduism, nr.judaism, led.life_expectancy_diff
-from 	(select *
-		 from integration_date_to_final_gini_GDP_Mortal) ctfggm
-		 join
-		 (select *
-		  from null_religion) nr
-		  on ctfggm.country = nr.country
-		 join
-		 (select *
-		  from life_expectyncy_diff) led
-		  on led.country = ctfggm.country;
 
+	 
 /* creating a table with weather altogether - tenth,eleventh,twelth task*/
 create table weather_complete_papay as
 select w.date as date, avg(w1.temp) as avg_temperature ,count(w2.rain) as number_of_raining_hours, max(w.wind) as max_wind
@@ -194,9 +179,25 @@ select w.date as date, avg(w1.temp) as avg_temperature ,count(w2.rain) as number
 		  where rain <> 0 and rain is not null) w2
 	on w.date = w2.date
 	group by date;
+	 
+/* creating table and putting altogether all before joing with the weather*/
+create table final_table_before_weather as
+select  ctfggm.*, nr.christianity, nr.islam, nr.hinduism, nr.judaism, led.life_expectancy_diff
+from 	(select *
+		 from integration_date_to_final_gini_GDP_Mortal) ctfggm
+		 join
+		 (select *
+		  from null_religion) nr
+		  on ctfggm.country = nr.country
+		 join
+		 (select *
+		  from life_expectyncy_diff) led
+		  on led.country = ctfggm.country;
+
+
+/* creating table and joing with the weather*/
 create table marek_papay_final_table as
 select ftbw.*, wcp.avg_temperature, wcp.number_of_raining_hours, wcp.max_wind 
 	from final_table_before_weather ftbw
 	join weather_complete_papay wcp
 	on ftbw.date = wcp.`date`;
-select * from marek_papay_final_table
