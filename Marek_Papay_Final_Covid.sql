@@ -41,7 +41,7 @@ create table papay_weekday as
 select *, case when weekday(date) in (5,6) then 1 else 0 end as week
 FROM covid19_basic cb; 
 
-/* creating a table seperate month,day - second task*/
+/* creating a table seperate month, day - second task*/
 create table day_month_papay as
 select date, month(date) as month_day, day(date) as day_date
 from covid19_basic cb;
@@ -60,7 +60,7 @@ select DISTINCT date, month_day, day_date,
 	   	end as seasons
 from day_month_papay dmp;
 
-/* deleting index as I had to copy tables from the other database*/
+/*Deleting index as I had to copy tables from the other database*/
 alter table t_Marek_Papay_projekt_SQL_final
 drop column `index`;
 
